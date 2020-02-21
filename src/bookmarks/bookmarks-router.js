@@ -9,7 +9,7 @@ const bodyParser = express.json();
 bookmarksRouter
   .route("/bookmarks")
   .get((req, res) => {
-    // here
+    res.json(bookmarks);
   })
   .post(bodyParser, (req, res) => {
     // here
