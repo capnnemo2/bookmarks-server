@@ -23,3 +23,5 @@ bookmarksRouter
   .delete((req, res) => {
     // here
   });
+
+module.exports = bookmarksRouter;
