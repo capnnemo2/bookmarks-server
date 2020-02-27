@@ -57,7 +57,19 @@ bookmarksRouter
 
 bookmarksRouter
   .route("/bookmarks/:id")
-  .get((req, res) => {
+  .get((req, res, next) => {
+    const knexInstance = req.app.get("db");
+    BookmarksService.getById(knexInstance, req.params.bookmark_id)
+      .then(bookmark => {
+        if (!bookmark) {
+          return res
+            .status(400)
+            .json({ error: { message: `Bookmark doesn't exist` } });
+        }
+        res.json(bookmark);
+      })
+      .catch(next);
+
     const { id } = req.params;
     const bookmark = bookmarks.find(b => b.id == id);
 
