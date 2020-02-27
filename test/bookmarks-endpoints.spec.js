@@ -43,4 +43,32 @@ describe.only("Bookmarks endpoints", function() {
       });
     });
   });
+
+  describe("GET /bookmarks/:bookmarks_id", () => {
+    context("Given no bookmarks", () => {
+      // this works correctly in postman, but test get error: ECONNREFUSED: Connection refused
+      it("responds with 404", () => {
+        const bookmarkId = 23456;
+        return supertest(app)
+          .get(`bookmarks/${bookmarkId}`)
+          .expect(404, { error: { message: `Bookmark doesn't exist` } });
+      });
+    });
+
+    context("Given there are bookmarks in the database", () => {
+      const testBookmarks = makeBookmarksArray();
+
+      beforeEach("insert bookmarks", () => {
+        return db.into("bookmarks").insert(testBookmarks);
+      });
+
+      it("GET /bookmarks/:bookmark_id responds with 200 and the specified bookmark", () => {
+        const bookmarkId = 2;
+        const expectedBookmark = testBookmarks[bookmarkId - 1];
+        return supertest(app)
+          .get(`/bookmarks/${bookmarkId}`)
+          .expect(200, expectedBookmark);
+      });
+    });
+  });
 });
