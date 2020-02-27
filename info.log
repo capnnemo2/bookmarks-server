@@ -4,3 +4,6 @@
 {"message":"Bookmark with id afcdb9b8-caf3-4f8b-b633-32ee0a760c3d not found","level":"error"}
 {"message":"Bookmark with id 2373a5dd-f87c-43c2-8dec-ea05469ba6e2 deleted","level":"info"}
 {"message":"Unauthorized request to path: /","level":"error"}
+{"message":"Unauthorized request to path: /bookmarks","level":"error"}
+{"message":"Unauthorized request to path: /bookmarks","level":"error"}
+{"message":"Unauthorized request to path: /bookmarks","level":"error"}
