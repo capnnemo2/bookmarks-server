@@ -30,4 +30,4 @@ const BookmarksService = {
   }
 };
 
-module.exports = ArticlesService;
+module.exports = BookmarksService;
