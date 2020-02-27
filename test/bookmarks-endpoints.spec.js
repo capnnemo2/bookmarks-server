@@ -66,7 +66,7 @@ describe.only("Bookmarks endpoints", function() {
       it("responds with 404", () => {
         const bookmarkId = 23456;
         return supertest(app)
-          .get(`bookmarks/${bookmarkId}`)
+          .get(`/bookmarks/${bookmarkId}`)
           .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: { message: `Bookmark doesn't exist` } });
       });
