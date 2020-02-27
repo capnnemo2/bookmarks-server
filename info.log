@@ -14,3 +14,8 @@
 {"message":"Bookmark with id 3 not found","level":"error"}
 {"message":"Bookmark with id 2 not found","level":"error"}
 {"message":"Bookmark with id 2 not found","level":"error"}
+{"message":"Unauthorized request to path: /bookmarks","level":"error"}
+{"message":"Unauthorized request to path: /bookmarks","level":"error"}
+{"message":"Unauthorized request to path: /bookmarks","level":"error"}
+{"message":"Unauthorized request to path: /bookmarks","level":"error"}
+{"message":"Unauthorized request to path: /bookmarks","level":"error"}
