@@ -28,5 +28,19 @@ describe.only("Bookmarks endpoints", function() {
           .expect(200, []);
       });
     });
+
+    context("Given there are bookmarks in the database", () => {
+      const testBookmarks = makeBookmarksArray;
+
+      beforeEach("insert bookmarks", () => {
+        return db.into("bookmarks").insert(testBookmarks);
+      });
+
+      it("GET /bookmarks responds with 200 and all of the bookmarks", () => {
+        return supertest(app)
+          .get("/bookmarks")
+          .expect(200, testBookmarks);
+      });
+    });
   });
 });
