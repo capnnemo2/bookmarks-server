@@ -20,6 +20,20 @@ describe.only("Bookmarks endpoints", function() {
 
   afterEach("cleanup", () => db("bookmarks").truncate());
 
+  describe("Unauthorized requests", () => {
+    it("responds with 401 Unauthorized for GET /bookmarks", () => {
+      return supertest(app)
+        .get("/bookmarks")
+        .expect(401, { error: "Unauthorized request" });
+    });
+
+    it("responds with 401 Unauthorized for GET /bookmarks/:bookmark_id", () => {
+      return supertest(app)
+        .get("/bookmarks/2")
+        .expect(401, { error: "Unauthorized request" });
+    });
+  });
+
   describe("GET /bookmarks", () => {
     context("Given there are no bookmarks in the database", () => {
       it("respondes with 200 and an empty list", () => {
