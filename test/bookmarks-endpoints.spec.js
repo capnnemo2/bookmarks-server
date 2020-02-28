@@ -151,6 +151,35 @@ describe.only("Bookmarks endpoints", function() {
       });
     });
 
+    it(`responds with 400 invalid 'rating' if not between 0 and 5`, () => {
+      const newBookmarkInvalidRating = {
+        title: "Test title",
+        url: "https://www.test.com",
+        rating: "invalid"
+      };
+      return supertest(app)
+        .post("/bookmarks")
+        .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
+        .send(newBookmarkInvalidRating)
+        .expect(400, {
+          error: { message: `'rating' must be a number between 0 and 5` }
+        });
+    });
+
+    it(`responds with 400 invalid 'url' if not a valid url`, () => {
+      const newBookmarkInvalidUrl = {
+        title: "Test title",
+        url: "htp:/invalid-url.cm",
+        rating: 1
+      };
+
+      return supertest(app)
+        .post("/bookmarks")
+        .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
+        .send(newBookmarkInvalidUrl)
+        .expect(400, { error: { message: `'url' must be a valid url` } });
+    });
+
     it("creates a bookmark, responding with 201 and the new bookmark", () => {
       const newBookmark = {
         title: "Test new bookmark",
