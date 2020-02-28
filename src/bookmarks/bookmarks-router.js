@@ -13,7 +13,7 @@ const serializeBookmark = bookmark => ({
   title: xss(bookmark.title),
   url: bookmark.url,
   description: xss(bookmark.description),
-  rating: bookmark.rating
+  rating: Number(bookmark.rating)
 });
 
 bookmarksRouter
@@ -28,7 +28,8 @@ bookmarksRouter
   })
   .post(bodyParser, (req, res, next) => {
     const { title, url, description, rating } = req.body;
-    const newBookmark = { title, url, rating, description };
+    // the order of keys in newBookmark might be causing problems
+    const newBookmark = { title, url, rating };
 
     for (const [key, value] of Object.entries(newBookmark)) {
       if (value == null) {
@@ -37,6 +38,21 @@ bookmarksRouter
           .json({ error: { message: `Missing '${key}' in request body` } });
       }
     }
+    const ratingNum = Number(rating);
+    if (!Number.isInteger(ratingNum) || ratingNum < 0 || ratingNum > 5) {
+      logger.error(`Invalid rating '${rating}' supplied`);
+      return res.status(400).send({
+        error: { message: `'rating' must be a number between 0 and 5` }
+      });
+    }
+
+    // FOR SOME REASON THIS BLOCK BREAKS THE POST ENDPOINT
+    // if (!isWebUri(url)) {
+    //   logger.error(`Invalid url '${url}' supplied`);
+    //   return res
+    //     .status(400)
+    //     .send({ error: { message: `'url' must be a valid url` } });
+    // }
 
     BookmarksService.insertArticle(req.app.get("db"), newBookmark)
       .then(bookmark => {
