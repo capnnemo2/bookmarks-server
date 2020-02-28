@@ -146,7 +146,7 @@ describe.only("Bookmarks endpoints", function() {
           .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send(newBookmark)
           .expect(400, {
-            error: { message: `Missing '${field}' in request body` }
+            error: { message: `'${field}' is required` }
           });
       });
     });

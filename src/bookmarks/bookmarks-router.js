@@ -1,9 +1,8 @@
 const express = require("express");
-const uuid = require("uuid/v4");
 const logger = require("../logger");
-const { bookmarks } = require("../store");
+const { isWebUri } = require("valid-url");
 const xss = require("xss");
-const BookmarksService = require("../bookmarks-service");
+const BookmarksService = require("./bookmarks-service");
 
 const bookmarksRouter = express.Router();
 const bodyParser = express.json();
@@ -28,16 +27,17 @@ bookmarksRouter
   })
   .post(bodyParser, (req, res, next) => {
     const { title, url, description, rating } = req.body;
-    // the order of keys in newBookmark might be causing problems
-    const newBookmark = { title, url, rating };
+    const newBookmark = { title, url, description, rating };
 
-    for (const [key, value] of Object.entries(newBookmark)) {
-      if (value == null) {
-        return res
-          .status(400)
-          .json({ error: { message: `Missing '${key}' in request body` } });
+    for (const field of ["title", "url", "rating"]) {
+      if (!req.body[field]) {
+        logger.error(`${field} is required`);
+        return res.status(400).send({
+          error: { message: `'${field}' is required` }
+        });
       }
     }
+
     const ratingNum = Number(rating);
     if (!Number.isInteger(ratingNum) || ratingNum < 0 || ratingNum > 5) {
       logger.error(`Invalid rating '${rating}' supplied`);
@@ -46,57 +46,22 @@ bookmarksRouter
       });
     }
 
-    // FOR SOME REASON THIS BLOCK BREAKS THE POST ENDPOINT
-    // if (!isWebUri(url)) {
-    //   logger.error(`Invalid url '${url}' supplied`);
-    //   return res
-    //     .status(400)
-    //     .send({ error: { message: `'url' must be a valid url` } });
-    // }
+    if (!isWebUri(url)) {
+      logger.error(`Invalid url '${url}' supplied`);
+      return res.status(400).send({
+        error: { message: `'url' must be a valid url` }
+      });
+    }
 
-    BookmarksService.insertArticle(req.app.get("db"), newBookmark)
+    BookmarksService.insertBookmark(req.app.get("db"), newBookmark)
       .then(bookmark => {
+        logger.info(`Bookmark with id ${bookmark.id} created`);
         res
           .status(201)
           .location(`/bookmarks/${bookmark.id}`)
           .json(serializeBookmark(bookmark));
       })
       .catch(next);
-
-    // if (!title) {
-    //   logger.error("Title is required");
-    //   return res.status(400).send("Invalid data");
-    // }
-
-    // if (!url) {
-    //   logger.error("Url is required");
-    //   return res.status(400).send("Invalid data");
-    // }
-
-    // if (!description) {
-    //   logger.error("Description is required");
-    //   return res.status(400).send("Invalid data");
-    // }
-
-    // if (!rating) {
-    //   logger.error("Rating is required");
-    //   return res.status(400).send("Invalid data");
-    // }
-
-    // const id = uuid();
-    // const bookmark = {
-    //   id,
-    //   title,
-    //   url,
-    //   description,
-    //   rating
-    // };
-
-    // bookmarks.push(bookmark);
-
-    // logger.info(`Bookmark with id ${id} created`);
-
-    // res.status(201).location(`http://localhost:8000/bookmark/${id}`);
   });
 
 bookmarksRouter
