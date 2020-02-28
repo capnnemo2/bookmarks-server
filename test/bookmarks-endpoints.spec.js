@@ -227,9 +227,9 @@ describe.only("Bookmarks endpoints", function() {
       it(`responds with 404`, () => {
         const bookmarkId = 123456;
         return supertest(app)
-          .delete(`/bookmark/${bookmarkId}`)
+          .delete(`/bookmarks/${bookmarkId}`)
           .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
-          .expect(404, { error: { message: `Bookmark doesn't exist` } });
+          .expect(404, { error: { message: `Bookmark not found` } });
       });
     });
 
@@ -250,7 +250,7 @@ describe.only("Bookmarks endpoints", function() {
           .delete(`/bookmarks/${idToRemove}`)
           .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(204)
-          .then(res => {
+          .then(() => {
             supertest(app)
               .get(`/bookmarks`)
               .set("Authorization", `Bearer ${process.env.API_TOKEN}`)

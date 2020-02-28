@@ -86,8 +86,8 @@ bookmarksRouter
   })
   .delete((req, res, next) => {
     const { bookmark_id } = req.params;
-    BookmarksService.deleteBookmark(req.app.get("db"), req.params.bookmark_id)
-      .then(numRowsAffected => {
+    BookmarksService.deleteBookmark(req.app.get("db"), bookmark_id)
+      .then(() => {
         logger.info(`Bookmark with id ${bookmark_id} deleted`);
         res.status(204).end();
       })
