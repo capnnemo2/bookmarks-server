@@ -28,40 +28,59 @@ bookmarksRouter
   })
   .post(bodyParser, (req, res) => {
     const { title, url, description, rating } = req.body;
-    if (!title) {
-      logger.error("Title is required");
-      return res.status(400).send("Invalid data");
+    const newBookmark = { title, url, rating };
+
+    for (const [key, value] of Object.entries(newBookmark)) {
+      if (value == null) {
+        return res
+          .status(400)
+          .json({ error: { message: `Missing '${key}' in request body` } });
+      }
     }
 
-    if (!url) {
-      logger.error("Url is required");
-      return res.status(400).send("Invalid data");
-    }
+    BookmarksService.insertArticle(req.app.get("db"), newBookmark).then(
+      bookmark => {
+        res
+          .status(201)
+          .location(`/bookmarks/${bookmark.id}`)
+          .json(serializeBookmark(bookmark));
+      }
+    );
 
-    if (!description) {
-      logger.error("Description is required");
-      return res.status(400).send("Invalid data");
-    }
+    // if (!title) {
+    //   logger.error("Title is required");
+    //   return res.status(400).send("Invalid data");
+    // }
 
-    if (!rating) {
-      logger.error("Rating is required");
-      return res.status(400).send("Invalid data");
-    }
+    // if (!url) {
+    //   logger.error("Url is required");
+    //   return res.status(400).send("Invalid data");
+    // }
 
-    const id = uuid();
-    const bookmark = {
-      id,
-      title,
-      url,
-      description,
-      rating
-    };
+    // if (!description) {
+    //   logger.error("Description is required");
+    //   return res.status(400).send("Invalid data");
+    // }
 
-    bookmarks.push(bookmark);
+    // if (!rating) {
+    //   logger.error("Rating is required");
+    //   return res.status(400).send("Invalid data");
+    // }
 
-    logger.info(`Bookmark with id ${id} created`);
+    // const id = uuid();
+    // const bookmark = {
+    //   id,
+    //   title,
+    //   url,
+    //   description,
+    //   rating
+    // };
 
-    res.status(201).location(`http://localhost:8000/bookmark/${id}`);
+    // bookmarks.push(bookmark);
+
+    // logger.info(`Bookmark with id ${id} created`);
+
+    // res.status(201).location(`http://localhost:8000/bookmark/${id}`);
   });
 
 bookmarksRouter
