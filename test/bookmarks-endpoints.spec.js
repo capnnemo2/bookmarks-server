@@ -151,32 +151,45 @@ describe.only("Bookmarks endpoints", function() {
       });
     });
 
-    // it("creates a bookmark, responding with 201 and the new bookmark", () => {
-    //   const newBookmark = {
-    //     title: "Test new bookmark",
-    //     url: "https://www.google.com",
-    //     description: "Test new bookmark description",
-    //     rating: 3
-    //   };
-    //   return supertest(app)
-    //     .post("/bookmarks")
-    //     .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
-    //     .send(newBookmark)
-    //     .expect(201)
-    //     .expect(res => {
-    //       expect(res.body.title).to.eql(newBookmark.title);
-    //       expect(res.body.url).to.eql(newBookmark.url);
-    //       expect(res.body.description).to.eql(newBookmark.description);
-    //       expect(res.body.rating).to.eql(newBookmark.rating);
-    //       expect(res.body).to.have.property("id");
-    //       expect(res.headers.location).to.eql(`/bookmarks/${res.body.id}`);
-    //     })
-    //     .then(postRes =>
-    //       supertest(app)
-    //         .get(`/bookmarks/${postRes.body.id}`)
-    //         .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
-    //         .expect(postRes.body)
-    //     );
-    // });
+    it("creates a bookmark, responding with 201 and the new bookmark", () => {
+      const newBookmark = {
+        title: "Test new bookmark",
+        url: "https://www.google.com",
+        description: "",
+        rating: 3
+      };
+      return supertest(app)
+        .post("/bookmarks")
+        .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
+        .send(newBookmark)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.title).to.eql(newBookmark.title);
+          expect(res.body.url).to.eql(newBookmark.url);
+          expect(res.body.description).to.eql(newBookmark.description);
+          expect(res.body.rating).to.eql(newBookmark.rating);
+          expect(res.body).to.have.property("id");
+          expect(res.headers.location).to.eql(`/bookmarks/${res.body.id}`);
+        })
+        .then(postRes =>
+          supertest(app)
+            .get(`/bookmarks/${postRes.body.id}`)
+            .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
+            .expect(postRes.body)
+        );
+    });
+
+    it("removes XSS attack content from response", () => {
+      const { maliciousBookmark, expectedBookmark } = makeMaliciousBookmark();
+      return supertest(app)
+        .post("/bookmarks")
+        .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
+        .send(maliciousBookmark)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.title).to.eql(expectedBookmark.title);
+          expect(res.body.description).to.eql(expectedBookmark.description);
+        });
+    });
   });
 });

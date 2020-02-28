@@ -26,9 +26,9 @@ bookmarksRouter
       })
       .catch(next);
   })
-  .post(bodyParser, (req, res) => {
+  .post(bodyParser, (req, res, next) => {
     const { title, url, description, rating } = req.body;
-    const newBookmark = { title, url, rating };
+    const newBookmark = { title, url, rating, description };
 
     for (const [key, value] of Object.entries(newBookmark)) {
       if (value == null) {
@@ -38,14 +38,14 @@ bookmarksRouter
       }
     }
 
-    BookmarksService.insertArticle(req.app.get("db"), newBookmark).then(
-      bookmark => {
+    BookmarksService.insertArticle(req.app.get("db"), newBookmark)
+      .then(bookmark => {
         res
           .status(201)
           .location(`/bookmarks/${bookmark.id}`)
           .json(serializeBookmark(bookmark));
-      }
-    );
+      })
+      .catch(next);
 
     // if (!title) {
     //   logger.error("Title is required");
