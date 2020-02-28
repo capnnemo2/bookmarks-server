@@ -82,23 +82,16 @@ bookmarksRouter
       .catch(next);
   })
   .get((req, res) => {
-    res.json(serializeBookmark(bookmark));
+    res.json(serializeBookmark(res.bookmark));
   })
   .delete((req, res, next) => {
-    const { id } = req.params;
+    const { bookmark_id } = req.params;
     BookmarksService.deleteBookmark(req.app.get("db"), req.params.bookmark_id)
       .then(numRowsAffected => {
         logger.info(`Bookmark with id ${bookmark_id} deleted`);
         res.status(204).end();
       })
       .catch(next);
-
-    // const bookmarkIndex = bookmarks.findIndex(b => b.id == id);
-
-    // if (bookmarkIndex === -1) {
-    //   logger.error(`Bookmark with id ${id} not found`);
-    //   return res.status(404).send("Not Found");
-    // }
   });
 
 module.exports = bookmarksRouter;
