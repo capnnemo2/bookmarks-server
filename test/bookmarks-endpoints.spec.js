@@ -1,7 +1,10 @@
 const { expect } = require("chai");
 const knex = require("knex");
 const app = require("../src/app");
-const { makeBookmarksArray } = require("./bookmarks.fixtures");
+const {
+  makeBookmarksArray,
+  makeMaliciousBookmark
+} = require("./bookmarks.fixtures");
 
 describe.only("Bookmarks endpoints", function() {
   let db;
@@ -36,7 +39,7 @@ describe.only("Bookmarks endpoints", function() {
 
   describe("GET /bookmarks", () => {
     context("Given there are no bookmarks in the database", () => {
-      it("respondes with 200 and an empty list", () => {
+      it("responds with 200 and an empty list", () => {
         return supertest(app)
           .get("/bookmarks")
           .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
@@ -58,17 +61,55 @@ describe.only("Bookmarks endpoints", function() {
           .expect(200, testBookmarks);
       });
     });
+
+    context("Given an XSS attack bookmark", () => {
+      const { maliciousBookmark, expectedBookmark } = makeMaliciousBookmark();
+
+      beforeEach("insert malicious bookmark", () => {
+        return db.into("bookmarks").insert([maliciousBookmark]);
+      });
+
+      it("removes XSS attack content", () => {
+        return supertest(app)
+          .get("/bookmarks")
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
+          .expect(200)
+          .expect(res => {
+            expect(res.body[0].title).to.eql(expectedBookmark.title);
+            expect(res.body[0].description).to.eql(
+              expectedBookmark.description
+            );
+          });
+      });
+    });
   });
 
   describe("GET /bookmarks/:bookmarks_id", () => {
     context("Given no bookmarks", () => {
-      // this works correctly in postman, but test gets error: ECONNREFUSED: Connection refused
       it("responds with 404", () => {
         const bookmarkId = 23456;
         return supertest(app)
           .get(`/bookmarks/${bookmarkId}`)
           .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: { message: `Bookmark doesn't exist` } });
+      });
+    });
+
+    context("Given an XSS attack bookmark", () => {
+      const { maliciousBookmark, expectedBookmark } = makeMaliciousBookmark();
+      beforeEach("insert malicious bookmark", () => {
+        return db.into("bookmarks").insert([maliciousBookmark]);
+      });
+
+      it("removes XSS attack content", () => {
+        return supertest(app)
+          .get(`/bookmarks/${maliciousBookmark.id}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
+          .expect(200)
+          .expect(res => {
+            expect(res.body.title).to.eql(expectedBookmark.title);
+            expect(res.body.description).to.eql(expectedBookmark.description);
+          });
       });
     });
 
