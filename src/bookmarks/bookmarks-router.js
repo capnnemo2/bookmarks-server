@@ -16,7 +16,7 @@ const serializeBookmark = bookmark => ({
 });
 
 bookmarksRouter
-  .route("/bookmarks")
+  .route("/")
   .get((req, res, next) => {
     const knexInstance = req.app.get("db");
     BookmarksService.getAllBookmarks(knexInstance)
@@ -65,7 +65,7 @@ bookmarksRouter
   });
 
 bookmarksRouter
-  .route("/bookmarks/:bookmark_id")
+  .route("/:bookmark_id")
   .all((req, res, next) => {
     const { bookmark_id } = req.params;
     BookmarksService.getById(req.app.get("db"), bookmark_id)
