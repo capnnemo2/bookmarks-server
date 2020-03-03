@@ -512,3 +512,8 @@
 {"message":"Bookmark with id 1 created","level":"info"}
 {"message":"Bookmark with id 123456 not found","level":"error"}
 {"message":"Bookmark with id 2 deleted","level":"info"}
+{"message":"Unauthorized request to path: /api/bookmarks/123456","level":"error"}
+{"message":"Bookmark with id 123456 not found","level":"error"}
+{"message":"Bookmark with id 123456 not found","level":"error"}
+{"message":"Bookmark with id 123456 not found","level":"error"}
+{"message":"Bookmark with id 123456 not found","level":"error"}
